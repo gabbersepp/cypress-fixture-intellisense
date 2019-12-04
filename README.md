@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/gabbersepp/cypress-fixture-intellisense.svg?branch=master)](https://travis-ci.org/gabbersepp/cypress-fixture-intellisense)
+-----------------------------------------------------------------------------------------------------------
+
 # cypress-fixture-intellisense README
 
 if you ever encountered the situation to specify one fixture file from hundreds in your tests, this extension will save you a bunch of time.
