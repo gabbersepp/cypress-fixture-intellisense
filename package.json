@@ -13,6 +13,7 @@
 	"activationEvents": [
 		"*"
 	],
+	"repository": "https://github.com/gabbersepp/cypress-fixture-intellisense",
 	"main": "./out/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
