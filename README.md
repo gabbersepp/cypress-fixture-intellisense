@@ -8,7 +8,7 @@ This extension parses the `cypress.json` file in your project root, reads the `f
 If you the write `cy.fixture("")` somewhere in your code and trigger a code suggestion (CTRL+Space on Windows), the extension suggests you all fixture files that matches the currently entered text.
 
 
-\!\[Suggestion\]\(images/example.gif\)
+![Suggestion](images/example.gif)
 
 > Note: This extension does not utilize the language server thus it is not as powerful than a real intellisense extension.
 
