@@ -28,10 +28,11 @@ function indexOfGroup(match: RegExpMatchArray, n: number) {
 		return - 1;
 	}
 
-    var ix = 0;match.index;
-    for (var i= 1; i<n; i++)
+	var ix = 0;
+    for (let i = 1; i < n; i++) {
         ix+= match[i].length;
-    return ix;
+	}
+	return ix;
 }
 
 function provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {

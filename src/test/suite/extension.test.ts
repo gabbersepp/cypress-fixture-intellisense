@@ -1,9 +1,5 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-// import * as myExtension from '../extension';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
@@ -19,15 +15,32 @@ suite('Extension Test Suite', () => {
 		assert.equal(extension.isActive, true);
 	});
 
-	test.only("suggestion should be enabled", async (done) => {
-		
-		const file = await vscode.workspace.findFiles("**/file1.js");
-		const testDocument = await vscode.workspace.openTextDocument(file[0]);
-		const testEditor = await vscode.window.showTextDocument(testDocument);
-		const pos = new vscode.Position(0, 12);
+	suite("suggestions", () => {
+		let document: vscode.TextDocument;
 
-		vscode.commands.executeCommand("vscode.executeCompletionItemProvider", testDocument.uri, pos).then(() => {
-			done();
-		});
-	}).timeout(20000);
+		async function setup(fileToOpen: string) {
+			const file = await vscode.workspace.findFiles(`**/${fileToOpen}`);
+			document = await vscode.workspace.openTextDocument(file[0]);
+			await vscode.window.showTextDocument(document);
+		}
+
+		test("suggestion should be enabled", async () => {
+			await setup("file1.js");
+			const pos = new vscode.Position(0, 12);
+			const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
+			const casted = result as vscode.CompletionList;
+			assert.equal(casted.items.length, 3);
+		}).timeout(20000);
+
+		test("suggestions should be filtered", async () => {
+			await setup("file2.js");
+			const pos = new vscode.Position(0, 16);
+			const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
+			const casted = result as vscode.CompletionList;
+			assert.equal(casted.items.length, 2);
+			casted.items.forEach(item => {
+				assert.equal((item.insertText as string).indexOf("test") > -1, true);
+			});
+		}).timeout(20000);
+	});
 });
