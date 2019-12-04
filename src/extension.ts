@@ -1,72 +1,71 @@
 import * as vscode from 'vscode';
+import * as fs from "fs";
+import * as glob from "glob";
+
+let fixtures: string[];
 
 export function activate(context: vscode.ExtensionContext) {
-
-	/*let provider1 = vscode.languages.registerCompletionItemProvider('typescript', {
-
-		provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
-
-			// a simple completion item which inserts `Hello World!`
-			const simpleCompletion = new vscode.CompletionItem('Hello World!');
-
-			// a completion item that inserts its text as snippet,
-			// the `insertText`-property is a `SnippetString` which will be
-			// honored by the editor.
-			const snippetCompletion = new vscode.CompletionItem('Good part of the day');
-			snippetCompletion.insertText = new vscode.SnippetString('Good ${1|morning,afternoon,evening|}. It is ${1}, right?');
-			snippetCompletion.documentation = new vscode.MarkdownString("Inserts a snippet that lets you select the _appropriate_ part of the day for your greeting.");
-
-			// a completion item that can be accepted by a commit character,
-			// the `commitCharacters`-property is set which means that the completion will
-			// be inserted and then the character will be typed.
-			const commitCharacterCompletion = new vscode.CompletionItem('console');
-			commitCharacterCompletion.commitCharacters = ['.'];
-			commitCharacterCompletion.documentation = new vscode.MarkdownString('Press `.` to get `console.`');
-
-			// a completion item that retriggers IntelliSense when being accepted,
-			// the `command`-property is set which the editor will execute after 
-			// completion has been inserted. Also, the `insertText` is set so that 
-			// a space is inserted after `new`
-			const commandCompletion = new vscode.CompletionItem('new');
-			commandCompletion.kind = vscode.CompletionItemKind.Keyword;
-			commandCompletion.insertText = 'new ';
-			commandCompletion.command = { command: 'editor.action.triggerSuggest', title: 'Re-trigger completions...' };
-
-			// return all completion items as array
-			return [
-				simpleCompletion,
-				snippetCompletion,
-				commitCharacterCompletion,
-				commandCompletion
-			];
-		}
-	});*/
-
-	const provider2 = vscode.languages.registerCompletionItemProvider(
+	const ts = vscode.languages.registerCompletionItemProvider(
 		{ scheme: "file", language: 'typescript' },
 		{
-			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
-
-				// get all text until the `position` and check if it reads `console.`
-				// and if so then complete if `log`, `warn`, and `error`
-				let linePrefix = document.lineAt(position).text.substr(0, position.character);
-				var matches = linePrefix.match(".*\.fixture(\"([^\"]+)");
-
-				if (!matches) {
-					return undefined;
-				}
-
-				var fileName = matches[1];
-				return [new vscode.CompletionItem(fileName + 'qqwqqwqw', vscode.CompletionItemKind.Method)];
-
-				return [
-					new vscode.CompletionItem('qqwqqwqw', vscode.CompletionItemKind.Method),
-					new vscode.CompletionItem('warn', vscode.CompletionItemKind.Method),
-					new vscode.CompletionItem('error', vscode.CompletionItemKind.Method),
-				];
-			}
+			provideCompletionItems
 		}
 	);
 
-	context.subscriptions.push(provider2);
+	const js = vscode.languages.registerCompletionItemProvider(
+		{ scheme: "file", language: 'javascript' },
+		{
+			provideCompletionItems
+		}
+	);
+
+	context.subscriptions.push(js, ts);
+	fixtures = readFixtures();
+}
+
+function indexOfGroup(match: RegExpMatchArray, n: number) {
+	if (typeof match.index === "undefined") {
+		return - 1;
+	}
+
+    var ix = 0;match.index;
+    for (var i= 1; i<n; i++)
+        ix+= match[i].length;
+    return ix;
+}
+
+function provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+
+	let linePrefix = document.lineAt(position).text.substr(0, position.character);
+	var matches = linePrefix.match("(.*\\.fixture\\(\")([^\"\\)]*)(\")?");
+
+	if (!matches) {
+		return undefined;
+	}
+
+	var fixtureName = matches[2];
+	var indexOfFirstQuote = indexOfGroup(matches, 2) - 1;
+	
+	if (indexOfFirstQuote <= position.character && !matches[3]) { //only trigger if between two quotes
+		return fixtures.filter(x => x.indexOf(fixtureName) > -1).map(x => {
+			return new vscode.CompletionItem(x, vscode.CompletionItemKind.Method)
+		})
+	} 
+
+	return undefined;
+}
+
+function readFixtures() {
+	
+	let obj = JSON.parse(fs.readFileSync(`${vscode.workspace.rootPath}/cypress.json`).toString());
+	let fixturesFolder = obj.fixturesFolder;
+	if (!fixturesFolder) {
+		return [];
+	}
+
+	let absolutePart = `${vscode.workspace.rootPath}/${fixturesFolder}/`.replace(/\\/g, "/");
+
+	let files = glob.sync(`${absolutePart}**/*.json`);
+	files = files.map(x => x.replace(/\\/g, "/").replace(absolutePart, ""));
+	return files;
 }
