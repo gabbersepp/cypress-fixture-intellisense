@@ -1,6 +1,6 @@
 {
 	"name": "cypress-fixture-intellisense",
-	"displayName": "cypress-fixture-intellisense",
+	"displayName": "Cypress Fixture-IntelliSense",
 	"description": "This extension will support your cy.fixture() command by providing intellisense for existing fixtures",
 	"version": "0.0.1",
 	"publisher": "JosefBiehler",
