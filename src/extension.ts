@@ -50,7 +50,7 @@ function provideCompletionItems(document: vscode.TextDocument, position: vscode.
 	if (indexOfFirstQuote <= position.character && !matches[3]) { //only trigger if between two quotes
 		return fixtures.filter(x => x.indexOf(fixtureName) > -1).map(x => {
 			return new vscode.CompletionItem(x, vscode.CompletionItemKind.Method)
-		})
+		});
 	} 
 
 	return undefined;
@@ -63,7 +63,13 @@ function readFixtures() {
 		return [];
 	}
 
-	var path = workspaces[0].uri.path;//.replace(/^\//, "");
+	var path = workspaces[0].uri.path;
+
+	if (process.platform === "win32") {
+		// on windows the path is something like /c:/...
+		// so remove this slash
+		path = path.replace(/^\//, "");
+	}
 
 	let obj = JSON.parse(fs.readFileSync(`${path}/cypress.json`).toString());
 	let fixturesFolder = obj.fixturesFolder;
