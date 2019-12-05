@@ -30,7 +30,7 @@
 		"@types/vscode": "1.40.0",
 		"glob": "7.1.6",
 		"mocha": "6.2.2",
-		"ncp": "^2.0.0",
+		"ncp": "2.0.0",
 		"tslint": "5.20.1",
 		"typescript": "3.7.2",
 		"vscode-test": "1.2.3"
