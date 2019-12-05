@@ -63,7 +63,7 @@ function readFixtures() {
 		return [];
 	}
 
-	var path = workspaces[0].uri.path.replace(/^\//, "");
+	var path = workspaces[0].uri.path;//.replace(/^\//, "");
 
 	let obj = JSON.parse(fs.readFileSync(`${path}/cypress.json`).toString());
 	let fixturesFolder = obj.fixturesFolder;
