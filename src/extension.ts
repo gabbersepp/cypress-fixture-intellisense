@@ -58,13 +58,20 @@ function provideCompletionItems(document: vscode.TextDocument, position: vscode.
 
 function readFixtures() {
 	
-	let obj = JSON.parse(fs.readFileSync(`${vscode.workspace.rootPath}/cypress.json`).toString());
+	var workspaces = vscode.workspace.workspaceFolders;
+	if (typeof workspaces === "undefined") {
+		return [];
+	}
+
+	var path = workspaces[0].uri.path.replace(/^\//, "");
+
+	let obj = JSON.parse(fs.readFileSync(`${path}/cypress.json`).toString());
 	let fixturesFolder = obj.fixturesFolder;
 	if (!fixturesFolder) {
 		return [];
 	}
 
-	let absolutePart = `${vscode.workspace.rootPath}/${fixturesFolder}/`.replace(/\\/g, "/");
+	let absolutePart = `${path}/${fixturesFolder}/`.replace(/\\/g, "/");
 
 	let files = glob.sync(`${absolutePart}**/*.json`);
 	files = files.map(x => x.replace(/\\/g, "/").replace(absolutePart, ""));

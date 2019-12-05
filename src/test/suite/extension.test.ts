@@ -25,7 +25,7 @@ suite('Extension Test Suite', () => {
 		}
 
 		test("suggestion should be enabled", async () => {
-			await setup("file1.js");
+			await setup("file1.ts");
 			const pos = new vscode.Position(0, 12);
 			const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
 			const casted = result as vscode.CompletionList;
