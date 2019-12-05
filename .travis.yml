@@ -12,5 +12,5 @@ install:
     fi
 script:
   - |
-    npm run pretest && npm run test
+    npm install && npm run pretest && npm run test
 cache: npm
