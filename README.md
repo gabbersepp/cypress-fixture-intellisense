@@ -21,12 +21,6 @@ No.
 
 ## Release Notes
 
-### 0.0.2
-
-Small adjustemnts in build scripts and docu
-
-### 0.0.1
-
-Initial release
+Take a look into the [Changelog](CHANGELOG.md)
 
 -----------------------------------------------------------------------------------------------------------

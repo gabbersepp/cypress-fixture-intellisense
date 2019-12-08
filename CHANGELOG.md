@@ -1,9 +1,5 @@
 # Change Log
 
-All notable changes to the "cypress-fixture-intellisense" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+## 1.0.2 - 2019-12-08
+### Fixed
+- package `glob` was not included as dependency but as dev-dependency and thus was not available
