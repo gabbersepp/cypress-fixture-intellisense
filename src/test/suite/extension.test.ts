@@ -64,6 +64,17 @@ suite('Extension Test Suite', () => {
 					assert.equal((item.insertText as string).indexOf("test") > -1, true);
 				});
 			}).timeout(20000);
+
+			test("suggestions should be filtered 2", async () => {
+				await setup("route1.js");
+				const pos = new vscode.Position(1, 60);
+				const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
+				const casted = result as vscode.CompletionList;
+				assert.equal(casted.items.length, 2);
+				casted.items.forEach(item => {
+					assert.equal((item.insertText as string).indexOf("test") > -1, true);
+				});
+			}).timeout(20000);
 		});
 	});
 });
