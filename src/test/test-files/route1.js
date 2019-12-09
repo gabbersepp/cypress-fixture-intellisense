@@ -1,0 +1,1 @@
+cy.route("GET", /.*test.*/, "fixture:test")

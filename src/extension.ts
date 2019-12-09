@@ -41,7 +41,10 @@ function provideCompletionItems(document: vscode.TextDocument, position: vscode.
 	var matches = linePrefix.match("(.*\\.fixture\\(\")([^\"\\)]*)(\")?");
 
 	if (!matches) {
-		return undefined;
+		matches = linePrefix.match("(.*\\.route\\([^\\)]+fixture:)([^\"]*)");
+		if (!matches) {
+			return undefined;
+		}
 	}
 
 	var fixtureName = matches[2];
