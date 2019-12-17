@@ -1,5 +1,8 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
+import * as path from "path";
+import * as fs from "fs";
+import { getFixturesPath } from '../../extension';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
@@ -22,6 +25,21 @@ suite('Extension Test Suite', () => {
 			const file = await vscode.workspace.findFiles(`**/${fileToOpen}`);
 			document = await vscode.workspace.openTextDocument(file[0]);
 			await vscode.window.showTextDocument(document);
+		}
+
+		async function createFile() {
+			
+			const ws = vscode.workspace.workspaceFolders;
+			if (!ws || ws.length === 0) {
+				throw new Error("fail");
+			}
+
+			const fp = getFixturesPath() as string;
+			const fixtureName = new Date().getTime().toString() + "test_new.json";
+			const fn = path.join(fp, fixtureName);
+			
+			fs.writeFileSync(fn, "dummy");
+			return fn;
 		}
 
 		suite("fixture", () => {
@@ -74,6 +92,17 @@ suite('Extension Test Suite', () => {
 				casted.items.forEach(item => {
 					assert.equal((item.insertText as string).indexOf("test") > -1, true);
 				});
+			}).timeout(20000);
+
+			test("suggestions should include newly created files", async () => {
+				const fn = await createFile();
+				await setup("route1.js");
+				const pos = new vscode.Position(1, 60);
+				const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
+				const casted = result as vscode.CompletionList;
+
+				const item = casted.items.find(item => (item.insertText as string).indexOf("_new") > -1);
+				assert.equal(!!item, true);
 			}).timeout(20000);
 		});
 	});

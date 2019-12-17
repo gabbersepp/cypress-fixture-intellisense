@@ -59,11 +59,11 @@ function provideCompletionItems(document: vscode.TextDocument, position: vscode.
 	return undefined;
 }
 
-function readFixtures() {
+export function getFixturesPath() {
 	
 	var workspaces = vscode.workspace.workspaceFolders;
 	if (typeof workspaces === "undefined") {
-		return [];
+		return null;
 	}
 
 	var path = workspaces[0].uri.path;
@@ -77,12 +77,18 @@ function readFixtures() {
 	let obj = JSON.parse(fs.readFileSync(`${path}/cypress.json`).toString());
 	let fixturesFolder = obj.fixturesFolder;
 	if (!fixturesFolder) {
-		return [];
+		return null;
 	}
 
-	let absolutePart = `${path}/${fixturesFolder}/`.replace(/\\/g, "/");
+	return `${path}/${fixturesFolder}/`.replace(/\\/g, "/");
+}
 
+function readFixtures() {
+	let absolutePart = getFixturesPath();
+	if (absolutePart === null) {
+		return [];
+	}
 	let files = glob.sync(`${absolutePart}**/*.json`);
-	files = files.map(x => x.replace(/\\/g, "/").replace(absolutePart, ""));
+	files = files.map(x => x.replace(/\\/g, "/").replace(absolutePart as string, ""));
 	return files;
 }
