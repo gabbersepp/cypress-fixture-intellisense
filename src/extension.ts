@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(js, ts);
-	fixtures = readFixtures();
+	setupFixturesLoader();
 }
 
 function indexOfGroup(match: RegExpMatchArray, n: number) {
@@ -83,12 +83,20 @@ export function getFixturesPath() {
 	return `${path}/${fixturesFolder}/`.replace(/\\/g, "/");
 }
 
+function setupFixturesLoader() {
+	const pattern = readFixtures();
+	const watcher = vscode.workspace.createFileSystemWatcher(pattern, false, true, false);
+	watcher.onDidCreate(readFixtures);
+	watcher.onDidDelete(readFixtures);
+}
+
 function readFixtures() {
 	let absolutePart = getFixturesPath();
 	if (absolutePart === null) {
-		return [];
+		fixtures = [];
 	}
-	let files = glob.sync(`${absolutePart}**/*.json`);
-	files = files.map(x => x.replace(/\\/g, "/").replace(absolutePart as string, ""));
-	return files;
+	const globPattern = `${absolutePart}**/*.json`;
+	let files = glob.sync(globPattern);
+	fixtures = files.map(x => x.replace(/\\/g, "/").replace(absolutePart as string, ""));
+	return globPattern;
 }

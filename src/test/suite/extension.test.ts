@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
 import { getFixturesPath } from '../../extension';
+import { afterEach } from 'mocha';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
@@ -94,16 +95,26 @@ suite('Extension Test Suite', () => {
 				});
 			}).timeout(20000);
 
-			test("suggestions should include newly created files", async () => {
-				const fn = await createFile();
-				await setup("route1.js");
-				const pos = new vscode.Position(1, 60);
-				const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
-				const casted = result as vscode.CompletionList;
+			suite("newly created file", () => {
+				let fileName: string;
 
-				const item = casted.items.find(item => (item.insertText as string).indexOf("_new") > -1);
-				assert.equal(!!item, true);
-			}).timeout(20000);
+				afterEach(() => {
+					fs.unlinkSync(fileName);
+				});
+
+				test("suggestions should include newly created files", async () => {
+					await setup("route1.js");
+					fileName = await createFile();
+					// wait until filewatcher has acted
+					await new Promise(resolve => setTimeout(resolve, 2000));
+					const pos = new vscode.Position(1, 60);
+					const result = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider", document.uri, pos);
+					const casted = result as vscode.CompletionList;
+	
+					const item = casted.items.find(item => (item.insertText as string).indexOf("_new") > -1);
+					assert.equal(!!item, true);
+				}).timeout(20000);
+			});
 		});
 	});
 });
