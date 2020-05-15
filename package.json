@@ -29,7 +29,7 @@
 	"devDependencies": {
 		"@types/glob": "7.1.1",
 		"@types/mocha": "7.0.2",
-		"@types/node": "12.12.25",
+		"@types/node": "12.12.39",
 		"@types/vscode": "1.41.0",
 		"mocha": "7.1.0",
 		"ncp": "2.0.0",
